@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MimGenerator</string>
+    <string name="content_list_image">list_image</string>
+</resources>
