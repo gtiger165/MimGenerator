@@ -1,13 +1,24 @@
 package com.example.mimgenerator.activity;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.mimgenerator.R;
 import com.google.gson.JsonObject;
 
@@ -17,7 +28,10 @@ import org.json.JSONObject;
 import java.util.Objects;
 
 public class DetailActivity extends AppCompatActivity implements View.OnClickListener {
+    private String TAG = DetailActivity.class.getSimpleName();
     public static final String EXTRA_MEME = "extra_meme";
+    public static final int REQUEST_IMAGE_DATA = 768;
+    private String urlImage;
     ImageView ivMeme;
     Button btnLogo, btnText;
     private JSONObject object;
@@ -45,6 +59,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     private void showMeme() throws JSONException {
         if (getIntent() != null) {
             object = new JSONObject(Objects.requireNonNull(getIntent().getStringExtra(EXTRA_MEME)));
+            urlImage = object.getString("url");
 
             Glide.with(this)
                     .load(object.getString("url"))
@@ -68,12 +83,50 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-
+        switch (v.getId()) {
+            case R.id.btn_add_logo:
+                Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(gallery, REQUEST_IMAGE_DATA);
+                break;
+            case R.id.btn_add_text:
+                break;
+        }
     }
 
     @Override
     public boolean onSupportNavigateUp() {
         finish();
         return super.onSupportNavigateUp();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            Log.d(TAG, "onActivityResult: " + data.getData());
+        }
+    }
+
+    private void displayOverlayImage(Context c, String path, ImageView iv) {
+        try {
+            Glide.with(c)
+                    .asBitmap()
+                    .load(path)
+                    .error(R.drawable.ic_baseline_photo_24)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                        }
+                    });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }
