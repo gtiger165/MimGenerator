@@ -107,7 +107,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    private void displayOverlayImage(Context c, String path, ImageView iv) {
+    private void displayOverlayImage(Context c, String path, final ImageView iv) {
         try {
             Glide.with(c)
                     .asBitmap()
@@ -117,7 +117,8 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                     .into(new CustomTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-
+//                            resource = Bitmap
+//                            iv.setImageBitmap();
                         }
 
                         @Override
